@@ -74,34 +74,68 @@
     </div>
 
     <script>
-        let numbers = [];
         let timer = 30;
         let interval;
         let isGameOver = false;
         let correctAnswer;
+        let operation;
 
         // Sayılarla işlemi başlat
         function startGame() {
-            numbers = [];
-            for (let i = 0; i < 4; i++) {
-                numbers.push(Math.floor(Math.random() * 10) + 1); // 1-10 arası sayılar
-            }
+            isGameOver = false;
+            document.getElementById('result').innerHTML = '';
+            timer = 30;
+            document.getElementById('timer').innerHTML = `Zaman: ${timer}`;
 
-            // Sayıları ekrana yazdır
-            document.getElementById('numbers').innerHTML = `Verilen Sayılar: ${numbers.join(' - ')}`;
-
-            // Şıkları oluştur
-            generateOptions();
+            // Yeni soru sor
+            generateQuestion();
             startTimer();
         }
 
-        // Şıkları oluştur
-        function generateOptions() {
-            let correctOptionIndex = Math.floor(Math.random() * 5);
-            let answer = numbers[0] + numbers[1] + numbers[2] + numbers[3]; // Basit toplama örneği
+        // Soru ve şıkları oluştur
+        function generateQuestion() {
+            let num1 = Math.floor(Math.random() * 10) + 1;
+            let num2 = Math.floor(Math.random() * 10) + 1;
+            let num3 = Math.floor(Math.random() * 10) + 1;
+            let num4 = Math.floor(Math.random() * 10) + 1;
 
+            // Rastgele işlem türü seçimi
+            let operations = ['+', '-', '*', '/'];
+            operation = operations[Math.floor(Math.random() * operations.length)];
+
+            let questionText = `${num1} ${operation} ${num2} ${operation} ${num3} ${operation} ${num4}`;
+            document.getElementById('numbers').innerHTML = `Soru: ${questionText}`;
+
+            // Hesaplanan doğru cevap
+            correctAnswer = evaluateExpression(num1, num2, num3, num4, operation);
+
+            // Şıkları oluştur
+            generateOptions(correctAnswer);
+        }
+
+        // İşlemi hesapla
+        function evaluateExpression(num1, num2, num3, num4, operation) {
+            switch (operation) {
+                case '+':
+                    return num1 + num2 + num3 + num4;
+                case '-':
+                    return num1 - num2 - num3 - num4;
+                case '*':
+                    return num1 * num2 * num3 * num4;
+                case '/':
+                    if (num2 !== 0 && num3 !== 0 && num4 !== 0) {
+                        return (num1 / num2 / num3 / num4).toFixed(2);
+                    } else {
+                        return (num1 / 1); // Bölen sıfır olmamalı
+                    }
+            }
+        }
+
+        // Şıkları oluştur
+        function generateOptions(correctAnswer) {
             let options = [];
-            options[correctOptionIndex] = answer; // Doğru cevap bir şıkta olacak
+            let correctOptionIndex = Math.floor(Math.random() * 5);
+            options[correctOptionIndex] = correctAnswer;
 
             // Yanlış şıkları oluştur
             for (let i = 0; i < 5; i++) {
@@ -116,8 +150,6 @@
                 shiklarHTML += `<button onclick="checkAnswer(${options[i]})">${options[i]}</button>`;
             }
             document.getElementById('shiklar').innerHTML = shiklarHTML;
-
-            correctAnswer = answer; // Doğru cevabı kaydediyoruz
         }
 
         // Cevap kontrolü
@@ -129,6 +161,9 @@
                 document.getElementById('result').innerHTML = "Yanlış Cevap, tekrar deneyin!";
             }
             isGameOver = true;
+            setTimeout(() => {
+                startGame(); // Yeni soru sor
+            }, 1500); // 1.5 saniye sonra yeni soru sor
         }
 
         // Zamanlayıcıyı başlat
