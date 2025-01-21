@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matematik Oyunu</title>
+    <title>Matematik Oyunu - Şıklı</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,11 +30,15 @@
             font-size: 24px;
             color: #d32f2f;
         }
+        #numbers {
+            font-size: 20px;
+            margin-top: 20px;
+        }
         .buttons {
             margin-top: 20px;
         }
         button {
-            font-size: 20px;
+            font-size: 18px;
             padding: 10px 20px;
             margin: 5px;
             border: none;
@@ -52,6 +56,9 @@
             font-size: 18px;
             color: #388e3c;
         }
+        #shiklar {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -61,7 +68,7 @@
         <div id="timer">Zaman: 30</div>
         <div id="numbers"></div>
         <div class="buttons">
-            <button onclick="submitAnswer()">Cevapla</button>
+            <div id="shiklar"></div>
         </div>
         <div id="result"></div>
     </div>
@@ -71,6 +78,7 @@
         let timer = 30;
         let interval;
         let isGameOver = false;
+        let correctAnswer;
 
         // Sayılarla işlemi başlat
         function startGame() {
@@ -78,8 +86,49 @@
             for (let i = 0; i < 4; i++) {
                 numbers.push(Math.floor(Math.random() * 10) + 1); // 1-10 arası sayılar
             }
+
+            // Sayıları ekrana yazdır
             document.getElementById('numbers').innerHTML = `Verilen Sayılar: ${numbers.join(' - ')}`;
+
+            // Şıkları oluştur
+            generateOptions();
             startTimer();
+        }
+
+        // Şıkları oluştur
+        function generateOptions() {
+            let correctOptionIndex = Math.floor(Math.random() * 5);
+            let answer = numbers[0] + numbers[1] + numbers[2] + numbers[3]; // Basit işlem örneği
+
+            let options = [];
+            options[correctOptionIndex] = answer; // Doğru cevap bir şıkta olacak
+
+            // Yanlış şıkları oluştur
+            for (let i = 0; i < 5; i++) {
+                if (i !== correctOptionIndex) {
+                    options[i] = Math.floor(Math.random() * 40) + 1; // Yanlış cevaplar rastgele seçilir
+                }
+            }
+
+            // Şıkları ekrana yazdır
+            let shiklarHTML = '';
+            for (let i = 0; i < options.length; i++) {
+                shiklarHTML += `<button onclick="checkAnswer(${options[i]})">${options[i]}</button>`;
+            }
+            document.getElementById('shiklar').innerHTML = shiklarHTML;
+
+            correctAnswer = answer; // Doğru cevabı kaydediyoruz
+        }
+
+        // Cevap kontrolü
+        function checkAnswer(selectedAnswer) {
+            if (isGameOver) return;
+            if (selectedAnswer === correctAnswer) {
+                document.getElementById('result').innerHTML = "Doğru Cevap!";
+            } else {
+                document.getElementById('result').innerHTML = "Yanlış Cevap, tekrar deneyin!";
+            }
+            isGameOver = true;
         }
 
         // Zamanlayıcıyı başlat
@@ -94,26 +143,6 @@
                 timer--;
                 document.getElementById('timer').innerHTML = 'Zaman: ' + timer;
             }, 1000);
-        }
-
-        // Cevabı kontrol et
-        function submitAnswer() {
-            if (isGameOver) return;
-            let userAnswer = prompt("Verilen sayılarla yapabileceğiniz işlem nedir? (Örnek: 1 + 2 * 3)");
-            
-            // Kullanıcıdan gelen cevabı kontrol et
-            try {
-                let result = eval(userAnswer);
-                if (result === numbers[0] + numbers[1] + numbers[2] + numbers[3] || result === numbers[0] * numbers[1] * numbers[2] * numbers[3]) {
-                    document.getElementById('result').innerHTML = "Doğru Cevap!";
-                } else {
-                    document.getElementById('result').innerHTML = "Yanlış Cevap, tekrar deneyin!";
-                }
-            } catch (e) {
-                document.getElementById('result').innerHTML = "Geçersiz işlem!";
-            }
-
-            isGameOver = true;
         }
 
         // Oyunu başlat
