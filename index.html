@@ -92,7 +92,7 @@
 
     <div class="container">
         <h1>Matematik Oyunu</h1>
-        <div id="timer">Zaman: 30</div>
+        <div id="timer">Zaman: 10</div>
         <div id="numbers"></div>
         <div class="buttons">
             <div id="shiklar"></div>
@@ -100,11 +100,12 @@
         <div id="result" class="message"></div>
         <div id="score">Puan: 0</div>
         <div id="questionNumber">Soru: 1 / 10</div>
+        <div id="highScore">En Yüksek Puan: 0</div>
         <button class="new-game-btn" onclick="startGame()">Yeni Oyun Başlat</button>
     </div>
 
     <script>
-        let timer = 30;
+        let timer = 10;
         let interval;
         let isGameOver = false;
         let correctAnswer;
@@ -121,7 +122,7 @@
             document.getElementById('score').innerHTML = `Puan: ${score}`;
             document.getElementById('questionNumber').innerHTML = `Soru: ${currentQuestion} / ${totalQuestions}`;
             document.getElementById('result').innerHTML = '';
-            timer = 30;
+            timer = 10;
             document.getElementById('timer').innerHTML = `Zaman: ${timer}`;
             isGameOver = false;
 
@@ -146,9 +147,6 @@
 
             // Şıkları oluştur
             generateOptions(correctAnswer);
-
-            // Zamanı soruya göre ayarla
-            adjustTimer(num1, num2, operation);
         }
 
         // İşlemi hesapla
@@ -197,6 +195,7 @@
                 score += 10;
                 document.getElementById('result').innerHTML = "Doğru Cevap!";
             } else {
+                score -= 5; // Yanlış cevapta puan düşürülür
                 document.getElementById('result').innerHTML = "Yanlış Cevap!";
             }
             document.getElementById('score').innerHTML = `Puan: ${score}`;
@@ -234,23 +233,13 @@
             }, 1000);
         }
 
-        // Zamanı soruya göre ayarla
-        function adjustTimer(num1, num2, operation) {
-            if (operation === '*' || operation === '/') {
-                timer = 20; // Çarpma ve bölme daha zor olduğu için daha kısa süre
-            } else {
-                timer = 30; // Toplama ve çıkarma için daha uzun süre
-            }
-            document.getElementById('timer').innerHTML = `Zaman: ${timer}`;
-        }
-
         // Oyun bitişi
         function endGame() {
             document.getElementById('result').innerHTML = `Oyun Bitti! Toplam Puan: ${score}`;
             if (score > highScore) {
                 highScore = score;
             }
-            document.getElementById('timer').innerHTML = `En Yüksek Puan: ${highScore}`;
+            document.getElementById('highScore').innerHTML = `En Yüksek Puan: ${highScore}`;
         }
 
         // Yeni oyun başlat
