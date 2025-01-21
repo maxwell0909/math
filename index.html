@@ -6,8 +6,8 @@
     <title>Matematik Oyunu - Şıklı</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f1f8e9;
+            font-family: 'Arial', sans-serif;
+            background-color: #fce4ec;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,20 +19,24 @@
             width: 90%;
             max-width: 600px;
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 2px solid #e91e63;
         }
         h1 {
-            color: #388e3c;
+            color: #d32f2f;
+            font-size: 2rem;
         }
         #timer {
             font-size: 24px;
             color: #d32f2f;
+            font-weight: bold;
         }
         #numbers {
-            font-size: 20px;
+            font-size: 24px;
             margin-top: 20px;
+            color: #388e3c;
         }
         .buttons {
             margin-top: 20px;
@@ -40,12 +44,12 @@
         button {
             font-size: 18px;
             padding: 10px 20px;
-            margin: 5px;
+            margin: 10px;
             border: none;
             background-color: #388e3c;
             color: white;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
             transition: background-color 0.3s;
         }
         button:hover {
@@ -55,9 +59,32 @@
             margin-top: 20px;
             font-size: 18px;
             color: #388e3c;
+            font-weight: bold;
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 10px;
+            color: #0288d1;
         }
         #shiklar {
             margin-top: 20px;
+        }
+        .message {
+            font-size: 20px;
+            color: #ff5722;
+        }
+        .new-game-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #8bc34a;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .new-game-btn:hover {
+            background-color: #7cb342;
         }
     </style>
 </head>
@@ -70,7 +97,9 @@
         <div class="buttons">
             <div id="shiklar"></div>
         </div>
-        <div id="result"></div>
+        <div id="result" class="message"></div>
+        <div id="score">Puan: 0</div>
+        <button class="new-game-btn" onclick="startGame()">Yeni Oyun Başlat</button>
     </div>
 
     <script>
@@ -79,54 +108,55 @@
         let isGameOver = false;
         let correctAnswer;
         let operation;
+        let score = 0;
+        let highScore = 0;
 
-        // Sayılarla işlemi başlat
+        // Yeni oyun başlat
         function startGame() {
-            isGameOver = false;
+            score = 0;
+            document.getElementById('score').innerHTML = `Puan: ${score}`;
             document.getElementById('result').innerHTML = '';
             timer = 30;
             document.getElementById('timer').innerHTML = `Zaman: ${timer}`;
+            isGameOver = false;
 
-            // Yeni soru sor
             generateQuestion();
             startTimer();
         }
 
-        // Soru ve şıkları oluştur
+        // Yeni soru üret
         function generateQuestion() {
             let num1 = Math.floor(Math.random() * 10) + 1;
             let num2 = Math.floor(Math.random() * 10) + 1;
-            let num3 = Math.floor(Math.random() * 10) + 1;
-            let num4 = Math.floor(Math.random() * 10) + 1;
 
-            // Rastgele işlem türü seçimi
+            // Rastgele işlem seçimi
             let operations = ['+', '-', '*', '/'];
             operation = operations[Math.floor(Math.random() * operations.length)];
 
-            let questionText = `${num1} ${operation} ${num2} ${operation} ${num3} ${operation} ${num4}`;
+            let questionText = `${num1} ${operation} ${num2}`;
             document.getElementById('numbers').innerHTML = `Soru: ${questionText}`;
 
             // Hesaplanan doğru cevap
-            correctAnswer = evaluateExpression(num1, num2, num3, num4, operation);
+            correctAnswer = evaluateExpression(num1, num2, operation);
 
             // Şıkları oluştur
             generateOptions(correctAnswer);
         }
 
         // İşlemi hesapla
-        function evaluateExpression(num1, num2, num3, num4, operation) {
+        function evaluateExpression(num1, num2, operation) {
             switch (operation) {
                 case '+':
-                    return num1 + num2 + num3 + num4;
+                    return num1 + num2;
                 case '-':
-                    return num1 - num2 - num3 - num4;
+                    return num1 - num2;
                 case '*':
-                    return num1 * num2 * num3 * num4;
+                    return num1 * num2;
                 case '/':
-                    if (num2 !== 0 && num3 !== 0 && num4 !== 0) {
-                        return (num1 / num2 / num3 / num4).toFixed(2);
+                    if (num2 !== 0) {
+                        return (num1 / num2).toFixed(2); // Bölme işlemi sonucu
                     } else {
-                        return (num1 / 1); // Bölen sıfır olmamalı
+                        return num1; // Sıfıra bölme durumunu önlüyoruz
                     }
             }
         }
@@ -156,23 +186,32 @@
         function checkAnswer(selectedAnswer) {
             if (isGameOver) return;
             if (selectedAnswer === correctAnswer) {
+                score += 10;
                 document.getElementById('result').innerHTML = "Doğru Cevap!";
             } else {
-                document.getElementById('result').innerHTML = "Yanlış Cevap, tekrar deneyin!";
+                document.getElementById('result').innerHTML = "Yanlış Cevap!";
             }
+            document.getElementById('score').innerHTML = `Puan: ${score}`;
             isGameOver = true;
+            if (score > highScore) {
+                highScore = score;
+            }
             setTimeout(() => {
-                startGame(); // Yeni soru sor
+                generateQuestion(); // Yeni soru sor
+                isGameOver = false;
             }, 1500); // 1.5 saniye sonra yeni soru sor
         }
 
         // Zamanlayıcıyı başlat
         function startTimer() {
             interval = setInterval(function() {
-                if (timer <= 0 || isGameOver) {
+                if (timer <= 0) {
                     clearInterval(interval);
                     document.getElementById('timer').innerHTML = 'Zaman Bitti!';
-                    document.getElementById('result').innerHTML = 'Oyun Bitti! Yeni oyuna başla.';
+                    if (score > highScore) {
+                        highScore = score;
+                    }
+                    document.getElementById('result').innerHTML = `Oyun Bitti! En yüksek Puan: ${highScore}`;
                     return;
                 }
                 timer--;
@@ -180,7 +219,7 @@
             }, 1000);
         }
 
-        // Oyunu başlat
+        // Yeni oyun başlat
         startGame();
     </script>
 
